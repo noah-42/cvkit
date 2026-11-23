@@ -4,15 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cvkit"
-version = "0.1.0"
+version = "0.2.0"
 description = "A minimal CV site and an ATS version from one data file."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-dependencies = []
+dependencies = ["jinja2>=3.1"]
 
 [project.scripts]
 cvkit = "cvkit.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["cvkit*"]
+
+[tool.setuptools.package-data]
+cvkit = ["templates/*.j2", "scaffold/**/*", "scaffold/.github/workflows/*", "scaffold/.gitignore"]

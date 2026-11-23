@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ name }} - ATS CV</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="ATS-friendly CV for {{ name }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata:400,700&display=swap">
+    <style>
+      body { font-family: "Inconsolata", "Courier New", monospace; font-size: 12pt; color: #24292f; max-width: 100%; margin: 24px auto; padding: 0 16px; line-height: 1.5; background: #fff; }
+      h1 { font-size: 20pt; margin-bottom: 4px; color: #0A66C2; }
+      h2 { font-size: 15pt; color: #444746; border-bottom: 1px solid #444746; margin-top: 20px; margin-bottom: 8px; }
+      h3 { font-size: 12pt; margin: 12px 0 2px; color: #0A66C2; }
+      p.headline { margin: 0 0 6px; color: #444746; font-style: italic; }
+      p.location { font-style: italic; color: #3d3d3d; margin: 0 0 4px; }
+      ul { margin: 4px 0 10px 22px; padding: 0; }
+      li { margin-bottom: 2px; color: #24292f; }
+      a { color: #0A66C2; }
+      .contact { margin-bottom: 8px; }
+      @media print {
+        @page { size: A4; margin: 14mm 16mm; }
+        body { margin: 0; padding: 0; font-size: 10.5pt; line-height: 1.35; }
+        h1 { font-size: 17pt; }
+        h2 { font-size: 12.5pt; margin-top: 12px; break-after: avoid; }
+        h3 { font-size: 10.5pt; break-after: avoid; }
+        a { color: inherit; text-decoration: none; }
+        .screen-only { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>{{ name }}</h1>
+    <p class="headline">{{ headline }}</p>
+    <p class="contact">{{ contact_line | join(" | ") }}<span class="screen-only"> | <a href="../">formatted version</a></span></p>
+
+    <h2>{{ sections.summary }}</h2>
+    <ul>
+{% for line in summary %}
+      <li>{{ line }}</li>
+{% endfor %}
+    </ul>
+
+    <h2>{{ sections.projects }}</h2>
+    <ul>
+{% for p in projects %}
+      <li>{{ p.name }}: {{ p.desc }}</li>
+{% endfor %}
+    </ul>
+
+    <h2>{{ sections.experience }}</h2>
+{% for e in experience %}
+    <h3>{{ e.heading }}</h3>
+{% if e.city %}
+    <p class="location">{{ e.city }}</p>
+{% endif %}
+{% if e.bullets %}
+    <ul>
+{% for b in e.bullets %}
+      <li>{{ b }}</li>
+{% endfor %}
+    </ul>
+{% endif %}
+
+{% endfor %}
+
+    <h2>{{ sections.education }}</h2>
+{% for e in education %}
+    <h3>{{ e.heading }}</h3>
+{% if e.city %}
+    <p class="location">{{ e.city }}</p>
+{% endif %}
+
+{% endfor %}
+
+    <h2>{{ sections.skills }}</h2>
+    <ul>
+{% for s in skills %}
+      <li>{{ s.label }}: {{ s.list }}</li>
+{% endfor %}
+    </ul>
+
+    <h2>{{ sections.languages }}</h2>
+    <p>{{ languages }}</p>
+
+    <h2>{{ sections.contact }}</h2>
+    <ul>
+{% for line in contact_list %}
+      <li>{{ line }}</li>
+{% endfor %}
+    </ul>
+  </body>
+</html>

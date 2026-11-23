@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{ name }}</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="{{ description }}" />
+    <meta name="author" content="{{ name }}" />
+{% for tag in head %}
+    {{ tag }}
+{% endfor %}
+{% if jsonld %}
+    <script type="application/ld+json">{{ jsonld }}</script>
+{% endif %}
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="navbar container">
+        <span class="name-row">
+          <a id="author-name" href="./">{{ name }}</a>
+          <span class="name-icons">
+{% for n in nav %}
+            <a target="_blank" rel="noopener" href="{{ n.url }}" aria-label="{{ n.label }}">{{ n.inner }}</a>
+{% endfor %}
+          </span>
+        </span>
+        <p id="headline">{{ headline }}</p>
+      </div>
+      <hr />
+
+      <div class="container content">
+        <h2 id="summary">{{ sections.summary }}</h2>
+
+        <ul>
+{% for line in summary %}
+          <li>{{ line }}</li>
+{% endfor %}
+        </ul>
+
+        <h2 id="projects">{{ sections.projects }}</h2>
+
+        <ul class="projects-table">
+{% for p in projects %}
+          <li><span class="project-name">{{ p.name }}</span>
+            <span class="project-desc">{{ p.desc }}</span>
+          </li>
+{% endfor %}
+        </ul>
+
+        <h2 id="experience">{{ sections.experience }}</h2>
+
+{% for e in experience %}
+        <h3>{{ e.heading }}</h3>
+        <p class="location">{{ e.loc }}</p>
+{% if e.bullets %}
+        <ul>
+{% for b in e.bullets %}
+          <li>{{ b }}</li>
+{% endfor %}
+        </ul>
+{% endif %}
+
+{% endfor %}
+        <h2 id="education">{{ sections.education }}</h2>
+
+{% for e in education %}
+        <h3>{{ e.heading }}</h3>
+        <p class="location">{{ e.loc }}</p>
+{% endfor %}
+        <h2 id="skills-tools">{{ sections.skills }}</h2>
+
+        <ul class="skills-table">
+{% for s in skills %}
+          <li><span class="skill-name">{{ s.label }}</span>
+            <span class="skill-desc">{{ s.list }}</span>
+          </li>
+{% endfor %}
+        </ul>
+
+        <h2 id="languages">{{ sections.languages }}</h2>
+
+        <p>{{ languages }}</p>
+
+        <h2 id="contact">{{ sections.contact }}</h2>
+
+        <div class="contact-list">
+          <div class="contact-row">{{ contact | join("") }}</div>
+        </div>
+
+        <div class="bottom-space"></div>
+      </div>
+    </div>
+  </body>
+</html>

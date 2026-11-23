@@ -1,6 +1,6 @@
 # cvkit plan
 
-Status: phase 1 done, Mon, 23-Nov-2026.
+Status: phase 2 done, Mon, 23-Nov-2026.
 
 ## Goal
 
@@ -84,3 +84,9 @@ A small model can invent facts, so:
 - Mon, 23-Nov-2026: phase 1 done. The engine (`cvkit build`) renders noah-42.github.io byte-for-byte the same as
   its old `build.py`; all its hard-coded links and page settings moved into `cv_data.json` under `site`. Themes are
   plain Python f-strings for now; moving them to Jinja2 is part of phase 2.
+- Mon, 23-Nov-2026: phase 2 done (v0.2.0). Jinja2 templates (a site's `templates/` folder overrides them); JSON Resume
+  import (a JSON Resume file works as `cv.json`) and `export-jsonresume`; schema.org JSON-LD on the designed page
+  (`site.jsonld: false` turns it off); print CSS and `cvkit pdf` through a local Chrome/Chromium (no Playwright
+  dependency: GitHub's runners already have Chrome); `private.json` lines reach only the local `--private` PDF;
+  `cvkit check` with `--job` keyword overlap; `cvkit init` and `serve`; the Pages workflow and the public template
+  repo `noah-42/cvkit-template`.
