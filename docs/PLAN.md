@@ -90,3 +90,5 @@ A small model can invent facts, so:
   dependency: GitHub's runners already have Chrome); `private.json` lines reach only the local `--private` PDF;
   `cvkit check` with `--job` keyword overlap; `cvkit init` and `serve`; the Pages workflow and the public template
   repo `noah-42/cvkit-template`.
+- Mon, 23-Nov-2026: v0.2.1. The Pages workflow pins `astral-sh/setup-uv@v10.4.0`; that action publishes no `v10` tag,
+  so the first template run failed at setup.
