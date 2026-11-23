@@ -1,6 +1,6 @@
 # cvkit plan
 
-Status: planned, Mon, 23-Nov-2026. Nothing built yet.
+Status: phase 1 done, Mon, 23-Nov-2026.
 
 ## Goal
 
@@ -81,3 +81,6 @@ A small model can invent facts, so:
 ## Change log
 
 - Mon, 23-Nov-2026: plan written; repo created.
+- Mon, 23-Nov-2026: phase 1 done. The engine (`cvkit build`) renders noah-42.github.io byte-for-byte the same as
+  its old `build.py`; all its hard-coded links and page settings moved into `cv_data.json` under `site`. Themes are
+  plain Python f-strings for now; moving them to Jinja2 is part of phase 2.
