@@ -22,7 +22,7 @@ uvx --from git+https://github.com/noah-42/cvkit cvkit init my-cv
 | `cvkit init [dir]` | Starter files: example `cv.json`, theme CSS, `.gitignore`, the GitHub Pages workflow |
 | `cvkit check [--job ad.txt]` | Checks the data (names fields, never quotes them); with `--job`, which of the ad's keywords the CV has |
 | `cvkit build [--out dir]` | Writes `index.html` (designed, with schema.org JSON-LD) and `ats/index.html` |
-| `cvkit pdf [--private]` | Prints the ATS page to `cv.pdf` with Chrome/Chromium; `--private` adds `private.json` lines into `private/cv.pdf` |
+| `cvkit pdf [--private]` | Prints the ATS page (set `site.pdf: true` to link it from the ATS page) to `cv.pdf` with Chrome/Chromium; `--private` adds `private.json` lines into `private/cv.pdf` |
 | `cvkit serve` | Builds into a temporary folder and serves it on `127.0.0.1:8000` |
 | `cvkit export-jsonresume` | Prints the data as [JSON Resume](https://jsonresume.org) |
 

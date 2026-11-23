@@ -33,7 +33,7 @@
   <body>
     <h1>{{ name }}</h1>
     <p class="headline">{{ headline }}</p>
-    <p class="contact">{{ contact_line | join(" | ") }}<span class="screen-only"> | <a href="../">formatted version</a></span></p>
+    <p class="contact">{{ contact_line | join(" | ") }}<span class="screen-only"> | <a href="../">formatted version</a>{% if pdf %} | <a href="../cv.pdf">PDF</a>{% endif %}</span></p>
 
     <h2>{{ sections.summary }}</h2>
     <ul>

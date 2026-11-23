@@ -92,3 +92,5 @@ A small model can invent facts, so:
   repo `noah-42/cvkit-template`.
 - Mon, 23-Nov-2026: v0.2.1. The Pages workflow pins `astral-sh/setup-uv@v10.4.0`; that action publishes no `v10` tag,
   so the first template run failed at setup.
+- Mon, 23-Nov-2026: v0.2.2. `site.pdf: true` links `cv.pdf` from the ATS page (on screen only; never in a `--private`
+  PDF). On in the starter `cv.json`.

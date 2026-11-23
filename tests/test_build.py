@@ -52,6 +52,14 @@ def test_private_lines_only_when_asked(tmp_path):
     assert "Phone: +00 0000" in pages(tmp_path, private=private)["ats/index.html"]
 
 
+def test_pdf_link(tmp_path):
+    assert '<a href="../cv.pdf">PDF</a>' in pages(tmp_path)["ats/index.html"]
+    d = data()
+    d["site"]["pdf"] = False
+    assert "cv.pdf" not in pages(tmp_path, d)["ats/index.html"]
+    assert "cv.pdf" not in pages(tmp_path, private={"contact_line": []})["ats/index.html"]
+
+
 def test_jsonld(tmp_path):
     page = pages(tmp_path)["index.html"]
     assert '<script type="application/ld+json">' in page

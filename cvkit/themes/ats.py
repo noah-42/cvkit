@@ -30,6 +30,7 @@ def context(data: dict, private: dict | None = None) -> dict:
 
     return {
         "name": site["name"],
+        "pdf": bool(site.get("pdf")) and not private,
         "headline": plain(data["headline"]),
         "contact_line": private.get("contact_line", []) + ats.get("contact_line", []),
         "sections": {**SECTIONS, **ats.get("sections", {})},
