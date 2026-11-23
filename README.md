@@ -2,7 +2,7 @@
 
 One data file, `cv.json`, becomes a minimal designed CV page, a plain ATS page and a PDF, published free on GitHub
 Pages. A later phase adds a model that runs on your own computer (Gemma 4 through Ollama) to help write and tailor
-the CV. Status: phase 2 done. See [docs/PLAN.md](docs/PLAN.md).
+the CV. Status: phase 3 started (import). See [docs/PLAN.md](docs/PLAN.md).
 
 ## Start a CV site
 
@@ -25,6 +25,15 @@ uvx --from git+https://github.com/noah-42/cvkit cvkit init my-cv
 | `cvkit pdf [--private]` | Prints the ATS page (set `site.pdf: true` to link it from the ATS page) to `cv.pdf` with Chrome/Chromium; `--private` adds `private.json` lines into `private/cv.pdf` |
 | `cvkit serve` | Builds into a temporary folder and serves it on `127.0.0.1:8000` |
 | `cvkit export-jsonresume` | Prints the data as [JSON Resume](https://jsonresume.org) |
+| `cvkit import old.pdf` | Turns an old CV (PDF, .txt, .md) into `cv.json` with a model on your own computer |
+
+### Import with a local model
+
+`cvkit import` sends the old CV's text to [Ollama](https://ollama.com) on this computer only (default model
+`gemma4`; `--model gemma4:12b` for the larger one) and refuses any other host unless you pass `--allow-remote`. The
+model only copies facts; cvkit then checks every fact against the old CV's text. Anything it cannot find there is
+left out: in a terminal you are asked about each one, otherwise they are listed in `cv.flagged.json`. If `cv.json`
+already exists, the result goes to `cv.imported.json`.
 
 ### PDF length and font size
 

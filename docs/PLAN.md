@@ -1,6 +1,6 @@
 # cvkit plan
 
-Status: phase 2 done, Mon, 23-Nov-2026.
+Status: phase 3 in progress, Tue, 24-Nov-2026.
 
 ## Goal
 
@@ -97,3 +97,10 @@ A small model can invent facts, so:
 - Mon, 23-Nov-2026: v0.2.3. `site.print` (font, start_pt, min_pt, max_pages): `cvkit pdf` shrinks the font in 0.5pt
   steps to fit max_pages, never below min_pt, and reports pages and size with notes against the recommended values
   (at least 10pt, at most 2 pages; proposed, not yet confirmed by Noah). Nothing changes for a site without `site.print`.
+- Tue, 24-Nov-2026: v0.3.0, first part of phase 3. Local Ollama connection (`cvkit/llm.py`; refuses non-local hosts
+  unless `--allow-remote`; answers forced into a JSON schema, temperature 0) and `cvkit import` (PDF via pdftotext or
+  pypdf, .txt, .md). Code checks every extracted fact against the source text; unmatched facts are asked about or
+  written to `cv.flagged.json`, never added quietly. Tests: an invented CV and a stand-in model that adds three
+  invented facts (all caught); a live test against Gemma 4 runs with `CVKIT_LIVE=1`. Live run on the invented CV (MacBook with 17 GB memory): `gemma4` (e4b) 32 facts, 0 flagged, 37 s;
+  `gemma4:12b` 32 facts, 0 flagged, 9 min 18 s, so the small model stays the default.
+  Next in phase 3: `interview` and `polish`.

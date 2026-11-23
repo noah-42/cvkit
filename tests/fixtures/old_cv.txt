@@ -1,0 +1,27 @@
+BEN SAMPLE
+Product designer · Rotterdam
+linkedin.com/in/ben-sample-example · bensample.example.com
+
+PROFILE
+Product designer with eight years of work on booking and payment apps.
+Likes small teams and quick tests with real users.
+
+EXPERIENCE
+Senior Product Designer — Harbour Travel B.V., Rotterdam
+March 2021 – present
+• Redesigned the checkout, which raised completed bookings by 12%.
+• Set up a weekly test day with five real customers.
+
+Product Designer — Example Pay, Utrecht
+Jan 2017 – Feb 2021
+• Designed the first version of the Example Pay mobile app.
+
+EDUCATION
+BA Interaction Design, Sample Academy of Arts, Breda, 2013 – 2016
+
+SKILLS
+Design: Figma, prototyping, user testing
+Code: HTML, CSS
+
+LANGUAGES
+Dutch (native), English (fluent), German (basic)
