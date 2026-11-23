@@ -1,0 +1,8 @@
+Data Engineer, Freight Analytics (invented ad for tests)
+
+We move containers across Europe and need a data engineer to keep our pipelines reliable.
+You will own our nightly batch jobs and the scheduler that runs them, reduce failures,
+and build data feeds for our tracking and shipment teams.
+
+Must have: Python, SQL, a scheduler such as Airflow, Linux, git.
+Nice to have: experience in logistics or shipment tracking, Kubernetes.

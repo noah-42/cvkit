@@ -67,7 +67,8 @@ def context(data: dict) -> dict:
         "name": site["name"],
         "description": site.get("description", site["name"]),
         "head": site.get("head", []),
-        "jsonld": jsonld(data) if site.get("jsonld", True) else "",
+        "jsonld": jsonld(data) if site.get("jsonld", True) and not site.get("noindex") else "",
+        "noindex": bool(site.get("noindex")),
         "nav": [{"label": n["label"], "url": n["url"],
                  "inner": BUILTIN.get(n["icon"]) or f'<img class="nav-icon" src="{n["icon"]}" alt="{n["label"]}" />'}
                 for n in site.get("nav", [])],

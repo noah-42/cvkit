@@ -1,6 +1,6 @@
 # cvkit plan
 
-Status: phase 3 in progress, Tue, 24-Nov-2026.
+Status: phase 4 done, Tue, 24-Nov-2026.
 
 ## Goal
 
@@ -110,3 +110,10 @@ A small model can invent facts, so:
   model answers in plain text (Gemma 4 sometimes ignores the JSON setting). Live on the invented CV with `gemma4`:
   polish 2 suggestions, both kept, 27 s; interview draft kept the stated result (40 to 25 minutes).
   Left in phase 3: an OpenAI-compatible connection for LM Studio and llama.cpp.
+- Tue, 24-Nov-2026: v0.4.0, phase 4. `cvkit tailor`: the model ranks item ids only (never writes text), code keeps
+  the chosen summary lines, bullets and projects, every job with at least one bullet, and all skills reordered.
+  Changes from the plan: tailoring chooses and reorders but does not reword (rewording can come later through
+  polish's guard), and versions are private by default (`private/tailored/<slug>/`), because where someone applies
+  is personal; `--publish` puts them at `/cv/<slug>/` (noindex, no JSON-LD). `cvkit build` and `cvkit pdf` include
+  published versions. The job-ad keyword list now prefers names and tools written with a capital, then repeated
+  words. Live on the invented CV and job ad with `gemma4`: 43 s; the unrelated bullet was dropped, Airflow moved first.

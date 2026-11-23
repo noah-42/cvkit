@@ -59,10 +59,11 @@ def _print(browser: str, page: str, out: Path) -> int:
     return count_pages(out.read_bytes())
 
 
-def make_pdf(root: Path, out: Path, private: bool = False, overrides: dict | None = None) -> PdfResult:
+def make_pdf(root: Path, out: Path, private: bool = False, overrides: dict | None = None,
+             data: dict | None = None) -> PdfResult:
     """Public PDF by default. With private=True, lines from private.json (phone, address) are added;
     keep that file out of git (`cvkit check` errors when it is not ignored). `overrides` replaces site.print keys."""
-    data = load(root)
+    data = json.loads(json.dumps(data)) if data is not None else load(root)
     if overrides:
         data.setdefault("site", {})["print"] = {**data["site"].get("print", {}), **overrides}
     s = print_settings(data.get("site", {}))

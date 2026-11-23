@@ -41,10 +41,15 @@ def _pdf(a) -> int:
     root = Path(a.root)
     out = Path(a.out) if a.out else (root / "private" / "cv.pdf" if a.private else root / "cv.pdf")
     overrides = {k: v for k, v in {"font": a.font, "min_pt": a.min_pt, "max_pages": a.max_pages}.items() if v is not None}
-    r = make_pdf(root, out, private=a.private, overrides=overrides)
-    print(f"wrote {r.path}: {r.pages} pages, {r.pt:g}pt, {r.font} font")
-    for note in r.notes:
-        print(f"note   {note}")
+    from .build import published_tailored
+    jobs = [(out, None)]
+    if not a.private:  # published tailored versions get their PDF next to their pages
+        jobs += [(out.parent / "cv" / slug / "cv.pdf", d) for slug, d in published_tailored(root)]
+    for target, data in jobs:
+        r = make_pdf(root, target, private=a.private, overrides=overrides, data=data)
+        print(f"wrote {r.path}: {r.pages} pages, {r.pt:g}pt, {r.font} font")
+        for note in r.notes:
+            print(f"note   {note}")
     return 0
 
 
@@ -155,6 +160,50 @@ def _interview(a) -> int:
     return 0
 
 
+def _tailor(a) -> int:
+    from .build import write_site
+    from .check import keyword_overlap
+    from .tailor import slugify, tailor
+    root = Path(a.root)
+    data = load(root)
+    job = Path(a.job).read_text()
+    slug = slugify(a.slug or Path(a.job).stem)
+    model = _model(a)
+    print(f"ranking the CV's items for {Path(a.job).name} with {model.model}...")
+    t = tailor(model, data, job)
+    before, _ = keyword_overlap(data, job)
+    after, missing = keyword_overlap(t, job)
+    n_b = sum(len(e.get("bullets", [])) for e in data["experience"])
+    n_t = sum(len(e.get("bullets", [])) for e in t["experience"])
+    if a.publish:
+        src = root / "tailored" / f"{slug}.json"
+        src.parent.mkdir(exist_ok=True)
+        src.write_text(json.dumps(t, indent=2, ensure_ascii=False) + "\n")
+        pages = write_site(root, t, root / "cv" / slug)
+        print(f"wrote {src} (published at /cv/{slug}/, noindex; it is public in your repository)")
+    else:
+        folder = root / "private" / "tailored" / slug
+        (folder / "cv.json").parent.mkdir(parents=True, exist_ok=True)
+        (folder / "cv.json").write_text(json.dumps(t, indent=2, ensure_ascii=False) + "\n")
+        pages = write_site(root, t, folder)
+        print(f"wrote {folder}/ (private: not committed, not published)")
+    for p in pages:
+        print(f"  {p}")
+    print(f"bullets: {n_t} of {n_b} kept; summary lines: {len(t['summary'])} of {len(data['summary'])}")
+    print(f"job ad keywords in the CV: {len(before)} before, {len(after)} after")
+    if missing:
+        print("  missing (only you can add these, if they are true): " + ", ".join(missing))
+    if not a.no_pdf:
+        from .pdf import make_pdf
+        target = pages[0].parent / "cv.pdf"
+        try:
+            r = make_pdf(root, target, data=t)
+            print(f"wrote {r.path}: {r.pages} pages, {r.pt:g}pt")
+        except RuntimeError as e:
+            print(f"no PDF: {e}")
+    return 0
+
+
 def _export(a) -> int:
     from .jsonresume import to_jsonresume
     json.dump(to_jsonresume(load(Path(a.root))), sys.stdout, indent=2, ensure_ascii=False)
@@ -198,7 +247,13 @@ def main(argv: list[str] | None = None) -> int:
     pol = cmd("polish", _polish, "suggest stronger bullets with a local model; you accept or reject each")
     pol.add_argument("--job", type=int, help="only this job (0 is the first in experience)")
     itv = cmd("interview", _interview, "ask about gaps (dates, empty jobs, headline) and add your answers")
-    for p in (im, pol, itv):
+    tl = cmd("tailor", _tailor, "a version of the CV for one job ad (choose and reorder only; private by default)",
+             root_positional=False)
+    tl.add_argument("job", help="the job ad as a text file")
+    tl.add_argument("--slug", help="name for this version (default: the job file's name)")
+    tl.add_argument("--publish", action="store_true", help="publish it at /cv/<slug>/ (noindex) instead of private/")
+    tl.add_argument("--no-pdf", action="store_true", help="skip the PDF")
+    for p in (im, pol, itv, tl):
         p.add_argument("--model", help="Ollama model (default: $CVKIT_MODEL or gemma4)")
         p.add_argument("--host", help="Ollama address (default: $OLLAMA_HOST or http://localhost:11434)")
         p.add_argument("--allow-remote", action="store_true", help="allow a model host that is not this computer")

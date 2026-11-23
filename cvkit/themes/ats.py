@@ -54,6 +54,7 @@ def context(data: dict, private: dict | None = None, pt: float | None = None) ->
 
     return {
         "name": site["name"],
+        "noindex": bool(site.get("noindex")),
         "pdf": bool(site.get("pdf")) and not private,
         "print": print_css(site, pt),
         "headline": plain(data["headline"]),

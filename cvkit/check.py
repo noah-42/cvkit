@@ -83,9 +83,28 @@ def check(root: Path, data: dict) -> list[tuple[str, str, str]]:
     return issues
 
 
-def _terms(text: str) -> Counter:
-    words = [w for w in re.findall(r"[a-z][a-z0-9+#.\-]*[a-z0-9+#]|[a-z]", text.lower()) if w not in STOP and len(w) > 1]
-    return Counter(words) + Counter(f"{a} {b}" for a, b in zip(words, words[1:]))
+_WORD = re.compile(r"[A-Za-z][A-Za-z0-9+#.\-]*[A-Za-z0-9+#]|[A-Za-z]")
+GENERIC = set("""need needs needed keep keeps own owns run runs make makes build builds move moves help helps
+reduce reduces like looking join joining want wants get gets take takes give gives find finds good great best
+them us they he she him her his hers it its we our ours you your yours who whom whose one two three first
+nice plus bonus ideal ideally preferred required requirement requirements responsibilities responsibility
+must have having day days week weeks month months daily new across every each some many much such very
+ad ads invented test tests apply applying applicant candidate candidates position opportunity""".split())
+
+
+def _terms(text: str) -> tuple[Counter, set[str]]:
+    """Word and two-word counts, plus the words written with a capital inside a sentence (likely names, tools)."""
+    words, capital = [], set()
+    for sentence in re.split(r"(?<=[.!?\n])\s+", text):
+        for n, w in enumerate(_WORD.findall(sentence)):
+            low = w.lower()
+            if low in STOP or low in GENERIC or len(low) < 2:
+                continue
+            words.append(low)
+            if n > 0 and (w[0].isupper() or any(c in w for c in "+#")):
+                capital.add(low)
+    counts = Counter(words) + Counter(f"{a} {b}" for a, b in zip(words, words[1:]))
+    return counts, capital
 
 
 def keyword_overlap(data: dict, job_text: str, top: int = 25) -> tuple[list[str], list[str]]:
@@ -94,6 +113,10 @@ def keyword_overlap(data: dict, job_text: str, top: int = 25) -> tuple[list[str]
                                      *[b for e in data["experience"] for b in e.get("bullets", [])],
                                      *[p["text"] for e in data["experience"] for p in e["heading_parts"]],
                                      *[i for s in data["skills"] for i in s["items"]]]).lower()
-    terms = [t for t, n in _terms(job_text).most_common() if n >= 2 or " " not in t][:top]
+    counts, capital = _terms(job_text)
+    # likely skills first (names and tools written with a capital), then words the ad repeats
+    terms = [t for t, n in counts.most_common() if t in capital] + \
+            [t for t, n in counts.most_common() if t not in capital and n >= 2]
+    terms = list(dict.fromkeys(terms))[:top]
     found = [t for t in terms if re.search(rf"(?<![a-z0-9]){re.escape(t)}(?![a-z0-9])", cv)]
     return found, [t for t in terms if t not in found]

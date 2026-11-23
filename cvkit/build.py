@@ -44,16 +44,30 @@ def render_pages(root: Path, data: dict, private: dict | None = None, pt: float 
     }
 
 
-def build(root: Path, data_path: Path | None = None, out: Path | None = None) -> list[Path]:
-    out = out or root
+def write_site(root: Path, data: dict, out: Path) -> list[Path]:
+    """Render `data` into `out`; static folders come along when `out` is not the site folder itself."""
     written = []
-    for rel, text in render_pages(root, load(root, data_path)).items():
+    for rel, text in render_pages(root, data).items():
         path = out / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
         written.append(path)
-    if out.resolve() != root.resolve():  # building into another folder (e.g. _site): bring the static files along
+    if out.resolve() != root.resolve():
         for name in STATIC:
             if (root / name).is_dir():
                 shutil.copytree(root / name, out / name, dirs_exist_ok=True)
+    return written
+
+
+def published_tailored(root: Path) -> list[tuple[str, dict]]:
+    """Tailored versions the owner chose to publish (tailored/<slug>.json), as (slug, data)."""
+    folder = root / "tailored"
+    return [(p.stem, json.loads(p.read_text())) for p in sorted(folder.glob("*.json"))] if folder.is_dir() else []
+
+
+def build(root: Path, data_path: Path | None = None, out: Path | None = None) -> list[Path]:
+    out = out or root
+    written = write_site(root, load(root, data_path), out)
+    for slug, data in published_tailored(root):
+        written += write_site(root, data, out / "cv" / slug)
     return written

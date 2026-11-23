@@ -2,7 +2,7 @@
 
 One data file, `cv.json`, becomes a minimal designed CV page, a plain ATS page and a PDF, published free on GitHub
 Pages. A later phase adds a model that runs on your own computer (Gemma 4 through Ollama) to help write and tailor
-the CV. Status: phase 3 nearly done (import, polish, interview). See [docs/PLAN.md](docs/PLAN.md).
+the CV. Status: phase 4 done (tailoring). See [docs/PLAN.md](docs/PLAN.md).
 
 ## Start a CV site
 
@@ -28,6 +28,7 @@ uvx --from git+https://github.com/noah-42/cvkit cvkit init my-cv
 | `cvkit import old.pdf` | Turns an old CV (PDF, .txt, .md) into `cv.json` with a model on your own computer |
 | `cvkit polish [--job N]` | The local model suggests stronger bullets; you accept or reject each one |
 | `cvkit interview` | Asks about gaps (missing dates, jobs without bullets, no headline) and adds your answers |
+| `cvkit tailor job.txt [--publish]` | A version for one job ad: your own items chosen and reordered, nothing added |
 
 ### Import with a local model
 
@@ -41,6 +42,18 @@ already exists, the result goes to `cv.imported.json`.
 that is not in the text it came from (the old bullet, or your own answer); suggestions that break this are dropped
 and named. Nothing changes in `cv.json` until you accept, and the previous file is kept as `cv.json.bak`. Outside a
 terminal, `polish` writes its suggestions to `cv.polish.json` and changes nothing.
+
+### Tailoring to a job ad
+
+`cvkit tailor job.txt --slug acme` asks the local model to rank your CV's items for that ad. The model returns item
+ids only, never text, so a tailored version cannot contain anything that is not in `cv.json`. Code then keeps the
+chosen summary lines, bullets and projects (most relevant first), keeps every job with at least one bullet, and
+reorders skills without removing any. It reports how many of the ad's keywords the CV has before and after, and
+which are missing (add them only if they are true).
+
+Where you apply is personal, so a tailored version is private by default: pages, PDF and data go to
+`private/tailored/<slug>/`, which is git-ignored. With `--publish` it is saved as `tailored/<slug>.json` and
+published at `/cv/<slug>/`, marked `noindex` and without JSON-LD; remember the repository itself is public.
 
 ### PDF length and font size
 
