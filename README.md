@@ -26,6 +26,14 @@ uvx --from git+https://github.com/noah-42/cvkit cvkit init my-cv
 | `cvkit serve` | Builds into a temporary folder and serves it on `127.0.0.1:8000` |
 | `cvkit export-jsonresume` | Prints the data as [JSON Resume](https://jsonresume.org) |
 
+### PDF length and font size
+
+`site.print` in `cv.json` controls the PDF: `font` (`mono` or `sans`), `start_pt` (10.5), `min_pt` (the smallest font
+size allowed) and `max_pages`. `cvkit pdf` starts at `start_pt` and goes down 0.5pt at a time until the CV fits in
+`max_pages`, never below `min_pt`; if it still does not fit, it says so and keeps `min_pt`. It always reports the page
+count and font size, with a note when they pass the recommended values (at least 10pt, at most 2 pages). The starter
+`cv.json` uses those values; `--font`, `--min-pt` and `--max-pages` override them for one run.
+
 A [JSON Resume](https://jsonresume.org) file also works as `cv.json` directly. Layout lives in Jinja2 templates
 (`cvkit/templates/`); put a file of the same name in your site's `templates/` folder to override it.
 

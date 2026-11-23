@@ -1,5 +1,6 @@
 """Tests use the invented person in the starter cv.json only, never a real CV."""
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -7,7 +8,9 @@ import pytest
 
 from cvkit.build import build, render_pages
 from cvkit.check import check, keyword_overlap
+from cvkit import pdf
 from cvkit.init import init
+from cvkit.pdf import count_pages
 from cvkit.jsonresume import from_jsonresume, jsonld, parse_range, to_jsonresume
 from cvkit.text import plain, split_location
 
@@ -141,3 +144,53 @@ def test_golden(tmp_path):
     build(tmp_path)
     assert (tmp_path / "index.html").read_text() == (GOLDEN / "index.html").read_text()
     assert (tmp_path / "ats" / "index.html").read_text() == (GOLDEN / "ats.html").read_text()
+
+
+def test_print_css_defaults_and_font(tmp_path):
+    page = pages(tmp_path)["ats/index.html"]
+    assert "font-size: 10.5pt; line-height: 1.35; }" in page and "h1 { font-size: 17pt; }" in page
+    d = data()
+    d["site"]["print"] = {"font": "sans"}
+    assert "sans-serif" in pages(tmp_path, d)["ats/index.html"].split("@media print")[1]
+    d["site"]["print"] = {"font": "comic"}
+    with pytest.raises(ValueError):
+        pages(tmp_path, d)
+
+
+def test_count_pages():
+    assert count_pages(b"<< /Type /Pages /Count 2 >> << /Type /Page >> << /Type/Page /X 1 >>") == 2
+
+
+def _fake_printer(pages_at):
+    """pages_at(pt) -> page count; stands in for Chrome."""
+    def fake(browser, page, out):
+        pt = float(re.search(r"body { margin: 0; padding: 0; font-size: ([0-9.]+)pt", page).group(1))
+        out.write_bytes(b"%PDF")
+        return pages_at(pt)
+    return fake
+
+
+def test_fit_shrinks_until_it_fits(tmp_path, monkeypatch):
+    init(tmp_path)
+    monkeypatch.setattr(pdf, "find_browser", lambda: "chrome")
+    monkeypatch.setattr(pdf, "_print", _fake_printer(lambda pt: 3 if pt > 10.2 else 2))
+    r = pdf.make_pdf(tmp_path, tmp_path / "cv.pdf")
+    assert (r.pages, r.pt, r.fits, r.notes) == (2, 10.0, True, [])
+
+
+def test_fit_stops_at_min_and_says_so(tmp_path, monkeypatch):
+    init(tmp_path)
+    monkeypatch.setattr(pdf, "find_browser", lambda: "chrome")
+    monkeypatch.setattr(pdf, "_print", _fake_printer(lambda pt: 3))
+    r = pdf.make_pdf(tmp_path, tmp_path / "cv.pdf")
+    assert (r.pages, r.pt, r.fits) == (3, 10.0, False)
+    assert any("does not fit" in n for n in r.notes) and any("recommended maximum" in n for n in r.notes)
+
+
+def test_below_recommended_min_is_reported(tmp_path, monkeypatch):
+    init(tmp_path)
+    monkeypatch.setattr(pdf, "find_browser", lambda: "chrome")
+    monkeypatch.setattr(pdf, "_print", _fake_printer(lambda pt: 3 if pt > 9.2 else 2))
+    r = pdf.make_pdf(tmp_path, tmp_path / "cv.pdf", overrides={"min_pt": 9})
+    assert (r.pages, r.pt) == (2, 9.0)
+    assert any("below the recommended minimum" in n for n in r.notes)

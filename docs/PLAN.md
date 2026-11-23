@@ -94,3 +94,6 @@ A small model can invent facts, so:
   so the first template run failed at setup.
 - Mon, 23-Nov-2026: v0.2.2. `site.pdf: true` links `cv.pdf` from the ATS page (on screen only; never in a `--private`
   PDF). On in the starter `cv.json`.
+- Mon, 23-Nov-2026: v0.2.3. `site.print` (font, start_pt, min_pt, max_pages): `cvkit pdf` shrinks the font in 0.5pt
+  steps to fit max_pages, never below min_pt, and reports pages and size with notes against the recommended values
+  (at least 10pt, at most 2 pages; proposed, not yet confirmed by Noah). Nothing changes for a site without `site.print`.

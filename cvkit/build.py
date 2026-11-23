@@ -36,11 +36,11 @@ def environment(root: Path) -> Environment:
     )
 
 
-def render_pages(root: Path, data: dict, private: dict | None = None) -> dict[str, str]:
+def render_pages(root: Path, data: dict, private: dict | None = None, pt: float | None = None) -> dict[str, str]:
     env = environment(root)
     return {
         "index.html": env.get_template(minimal.TEMPLATE).render(minimal.context(data)),
-        "ats/index.html": env.get_template(ats.TEMPLATE).render(ats.context(data, private)),
+        "ats/index.html": env.get_template(ats.TEMPLATE).render(ats.context(data, private, pt)),
     }
 
 

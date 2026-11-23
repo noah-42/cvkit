@@ -40,7 +40,11 @@ def _pdf(a) -> int:
     from .pdf import make_pdf
     root = Path(a.root)
     out = Path(a.out) if a.out else (root / "private" / "cv.pdf" if a.private else root / "cv.pdf")
-    print(f"wrote {make_pdf(root, out, private=a.private)}")
+    overrides = {k: v for k, v in {"font": a.font, "min_pt": a.min_pt, "max_pages": a.max_pages}.items() if v is not None}
+    r = make_pdf(root, out, private=a.private, overrides=overrides)
+    print(f"wrote {r.path}: {r.pages} pages, {r.pt:g}pt, {r.font} font")
+    for note in r.notes:
+        print(f"note   {note}")
     return 0
 
 
@@ -91,6 +95,9 @@ def main(argv: list[str] | None = None) -> int:
     p = cmd("pdf", _pdf, "print the ATS page to cv.pdf (needs Chrome or Chromium)")
     p.add_argument("--out")
     p.add_argument("--private", action="store_true", help="add private.json lines; writes private/cv.pdf")
+    p.add_argument("--font", choices=["mono", "sans"], help="override site.print.font")
+    p.add_argument("--min-pt", type=float, help="override site.print.min_pt (smallest font size allowed)")
+    p.add_argument("--max-pages", type=int, help="override site.print.max_pages")
     cmd("init", _init, "create a new site folder from the starter files")
     s = cmd("serve", _serve, "build into a temporary folder and show it on localhost")
     s.add_argument("--port", type=int, default=8000)
@@ -99,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return args.fn(args)
-    except (FileNotFoundError, FileExistsError, RuntimeError) as e:
+    except (FileNotFoundError, FileExistsError, RuntimeError, ValueError) as e:
         print(f"cvkit: {e}", file=sys.stderr)
         return 2
 
