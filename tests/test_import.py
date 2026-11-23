@@ -117,3 +117,17 @@ def test_live_model_on_invented_cv():
     titles = [w["position"] for w in resume["work"]]
     assert "Senior Product Designer" in titles and "Product Designer" in titles
     assert len(flags) <= 3
+
+
+def test_model_retries_once_when_answer_is_not_json(monkeypatch):
+    replies = iter([{"message": {"content": "* Built a weekly report."}},
+                    {"message": {"content": "```json\n{\"bullets\": [\"Built a weekly report.\"]}\n```"}}])
+    sent = []
+    m = Ollama()
+    monkeypatch.setattr(m, "_post", lambda path, body: sent.append(body) or next(replies))
+    assert m.json("sys", "user", {"type": "object"}) == {"bullets": ["Built a weekly report."]}
+    assert "Reply with JSON only" in sent[1]["messages"][0]["content"]
+    replies2 = iter([{"message": {"content": "nope"}}, {"message": {"content": ""}}])
+    monkeypatch.setattr(m, "_post", lambda path, body: next(replies2))
+    with pytest.raises(ModelError):
+        m.json("sys", "user", {"type": "object"})

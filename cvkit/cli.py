@@ -71,7 +71,6 @@ def _serve(a) -> int:
 
 def _import(a) -> int:
     from .importer import check_and_assemble, extract, read_source, to_cv
-    from .llm import Ollama
     root = Path(a.root)
     src = Path(a.source)
     out = Path(a.out) if a.out else (root / "cv.imported.json" if (root / "cv.json").exists() else root / "cv.json")
@@ -80,7 +79,7 @@ def _import(a) -> int:
     text = read_source(src)
     if not text.strip():
         raise RuntimeError(f"no text found in {src} (a scanned PDF needs OCR first)")
-    model = Ollama(a.model, a.host, allow_remote=a.allow_remote)
+    model = _model(a)
     print(f"reading {src} with {model.model} on {model.host} (this can take a few minutes)...")
     extracted = extract(model, text)
     resume, flags, checked = check_and_assemble(extracted, text)
@@ -100,6 +99,59 @@ def _import(a) -> int:
         flagged.write_text(json.dumps([f.__dict__ for f in left_out], indent=2, ensure_ascii=False) + "\n")
         print(f"left out (not in the source): {flagged}")
     print("next: cvkit check, then cvkit serve")
+    return 0
+
+
+def _model(a):
+    from .llm import Ollama
+    return Ollama(a.model, a.host, allow_remote=a.allow_remote)
+
+
+def _polish(a) -> int:
+    from .edit import apply, load_raw, polish, save_raw
+    path, data = load_raw(Path(a.root))
+    model = _model(a)
+    print(f"asking {model.model} for suggestions on {path.name} (about half a minute per job)...")
+    changes, dropped = polish(model, data, a.job)
+    for p, text, why in dropped:
+        print(f"dropped  {p}: {why}")
+    if not changes:
+        print("no suggestions")
+        return 0
+    if not sys.stdin.isatty():
+        out = path.with_name(path.stem + ".polish.json")
+        out.write_text(json.dumps([c.__dict__ for c in changes], indent=2, ensure_ascii=False) + "\n")
+        print(f"{len(changes)} suggestions written to {out}; {path.name} is unchanged (run in a terminal to accept)")
+        return 0
+    accepted = []
+    for c in changes:
+        print(f"\n{c.path}\n  before: {c.before}\n  after:  {c.after}")
+        if input("  use the new one? [y/N] ").strip().lower() == "y":
+            accepted.append(c)
+    if accepted:
+        backup = save_raw(path, apply(data, accepted))
+        print(f"\n{len(accepted)} of {len(changes)} accepted; {path.name} updated (old file: {backup.name})")
+    else:
+        print("\nnothing accepted; no change")
+    return 0
+
+
+def _interview(a) -> int:
+    from .edit import apply, find_gaps, interview, load_raw, save_raw
+    path, data = load_raw(Path(a.root))
+    gaps = find_gaps(data)
+    if not gaps:
+        print("no gaps found: every job has dates and bullets, and there is a headline")
+        return 0
+    if not sys.stdin.isatty():
+        raise RuntimeError(f"{len(gaps)} gaps found; interview asks questions, so run it in a terminal")
+    print(f"{len(gaps)} gaps. Press Enter to skip a question.\n")
+    accepted = interview(_model(a), data, input, print)
+    if accepted:
+        backup = save_raw(path, apply(data, accepted))
+        print(f"\n{len(accepted)} answers added; {path.name} updated (old file: {backup.name})")
+    else:
+        print("\nnothing added; no change")
     return 0
 
 
@@ -143,9 +195,13 @@ def main(argv: list[str] | None = None) -> int:
              root_positional=False)
     im.add_argument("source", help="the old CV")
     im.add_argument("--out", help="default: cv.json, or cv.imported.json when cv.json exists")
-    im.add_argument("--model", help="Ollama model (default: $CVKIT_MODEL or gemma4)")
-    im.add_argument("--host", help="Ollama address (default: $OLLAMA_HOST or http://localhost:11434)")
-    im.add_argument("--allow-remote", action="store_true", help="allow a model host that is not this computer")
+    pol = cmd("polish", _polish, "suggest stronger bullets with a local model; you accept or reject each")
+    pol.add_argument("--job", type=int, help="only this job (0 is the first in experience)")
+    itv = cmd("interview", _interview, "ask about gaps (dates, empty jobs, headline) and add your answers")
+    for p in (im, pol, itv):
+        p.add_argument("--model", help="Ollama model (default: $CVKIT_MODEL or gemma4)")
+        p.add_argument("--host", help="Ollama address (default: $OLLAMA_HOST or http://localhost:11434)")
+        p.add_argument("--allow-remote", action="store_true", help="allow a model host that is not this computer")
     im.add_argument("--no-ask", action="store_true", help="leave flagged items out without asking")
 
     args = parser.parse_args(argv)

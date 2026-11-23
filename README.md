@@ -2,7 +2,7 @@
 
 One data file, `cv.json`, becomes a minimal designed CV page, a plain ATS page and a PDF, published free on GitHub
 Pages. A later phase adds a model that runs on your own computer (Gemma 4 through Ollama) to help write and tailor
-the CV. Status: phase 3 started (import). See [docs/PLAN.md](docs/PLAN.md).
+the CV. Status: phase 3 nearly done (import, polish, interview). See [docs/PLAN.md](docs/PLAN.md).
 
 ## Start a CV site
 
@@ -26,6 +26,8 @@ uvx --from git+https://github.com/noah-42/cvkit cvkit init my-cv
 | `cvkit serve` | Builds into a temporary folder and serves it on `127.0.0.1:8000` |
 | `cvkit export-jsonresume` | Prints the data as [JSON Resume](https://jsonresume.org) |
 | `cvkit import old.pdf` | Turns an old CV (PDF, .txt, .md) into `cv.json` with a model on your own computer |
+| `cvkit polish [--job N]` | The local model suggests stronger bullets; you accept or reject each one |
+| `cvkit interview` | Asks about gaps (missing dates, jobs without bullets, no headline) and adds your answers |
 
 ### Import with a local model
 
@@ -34,6 +36,11 @@ uvx --from git+https://github.com/noah-42/cvkit cvkit init my-cv
 model only copies facts; cvkit then checks every fact against the old CV's text. Anything it cannot find there is
 left out: in a terminal you are asked about each one, otherwise they are listed in `cv.flagged.json`. If `cv.json`
 already exists, the result goes to `cv.imported.json`.
+
+`cvkit polish` and `cvkit interview` use the same local model. A suggestion may never contain a number or a name
+that is not in the text it came from (the old bullet, or your own answer); suggestions that break this are dropped
+and named. Nothing changes in `cv.json` until you accept, and the previous file is kept as `cv.json.bak`. Outside a
+terminal, `polish` writes its suggestions to `cv.polish.json` and changes nothing.
 
 ### PDF length and font size
 

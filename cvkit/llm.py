@@ -42,14 +42,34 @@ class Ollama:
             raise ModelError(f"cannot reach Ollama at {self.host}; is it running? ({e.reason})") from e
 
     def json(self, system: str, user: str, schema: dict) -> dict:
-        """One question, one answer shaped by `schema`. Temperature 0 so the same input gives the same answer."""
-        reply = self._post("/api/chat", {
-            "model": self.model, "stream": False, "format": schema,
-            "options": {"temperature": 0, "num_ctx": 16384},
-            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        })
-        text = reply.get("message", {}).get("content", "")
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError as e:
-            raise ModelError("the model did not return valid JSON; try a larger model (--model gemma4:12b)") from e
+        """One question, one answer shaped by `schema`. Temperature 0 so the same input gives the same answer.
+
+        Small models sometimes ignore the schema and answer in plain text; then it asks once more, with the
+        schema written into the instructions, before giving up."""
+        for attempt in range(2):
+            sys_text = system if attempt == 0 else (
+                system + "\n\nReply with JSON only, no other text, matching this JSON schema:\n" + json.dumps(schema))
+            reply = self._post("/api/chat", {
+                "model": self.model, "stream": False, "format": schema,
+                "options": {"temperature": 0, "num_ctx": 16384},
+                "messages": [{"role": "system", "content": sys_text}, {"role": "user", "content": user}],
+            })
+            parsed = _parse(reply.get("message", {}).get("content", ""))
+            if isinstance(parsed, dict):
+                return parsed
+        raise ModelError("the model did not return valid JSON twice; try a larger model (--model gemma4:12b)")
+
+
+def _parse(text: str):
+    """The JSON object in `text`, also when the model wrapped it in a code fence or a sentence."""
+    text = text.strip()
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        start, end = text.find("{"), text.rfind("}")
+        if start != -1 and end > start:
+            try:
+                return json.loads(text[start:end + 1])
+            except json.JSONDecodeError:
+                return None
+    return None

@@ -103,4 +103,10 @@ A small model can invent facts, so:
   written to `cv.flagged.json`, never added quietly. Tests: an invented CV and a stand-in model that adds three
   invented facts (all caught); a live test against Gemma 4 runs with `CVKIT_LIVE=1`. Live run on the invented CV (MacBook with 17 GB memory): `gemma4` (e4b) 32 facts, 0 flagged, 37 s;
   `gemma4:12b` 32 facts, 0 flagged, 9 min 18 s, so the small model stays the default.
-  Next in phase 3: `interview` and `polish`.
+  
+- Tue, 24-Nov-2026: v0.3.1. `cvkit polish` (suggested bullets, accepted one by one) and `cvkit interview` (gaps found
+  by code; dates parsed by code; the model only turns your answer into bullets). Shared guard: no number or name
+  that is not in the source text. The model connection retries once with the schema in the instructions when the
+  model answers in plain text (Gemma 4 sometimes ignores the JSON setting). Live on the invented CV with `gemma4`:
+  polish 2 suggestions, both kept, 27 s; interview draft kept the stated result (40 to 25 minutes).
+  Left in phase 3: an OpenAI-compatible connection for LM Studio and llama.cpp.
