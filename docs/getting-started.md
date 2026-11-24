@@ -12,6 +12,10 @@ GitHub Pages. A model on your own computer can help you write it; nothing you ty
 4. Edit `cv.json` on GitHub and commit. After a minute or two your CV is live at `https://<your-username>.github.io/`,
    with the ATS page at `/ats/` and the PDF at `/cv.pdf`.
 
+The Action already runs when the repository is created, before Pages is on: that first run builds your CV and
+ends with a note "Almost there" instead of publishing. After step 3, your next commit publishes it (or open the
+Actions tab and press **Run workflow**).
+
 If the Action fails, its log names the problem: usually a field in `cv.json` (`cvkit check` explains each one).
 
 ## 2. Work on it on your computer

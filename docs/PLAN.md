@@ -1,6 +1,6 @@
 # cvkit plan
 
-Status: all five phases done, Tue, 24-Nov-2026 (v0.5.2).
+Status: all five phases done, Tue, 24-Nov-2026 (v0.5.3).
 
 ## Goal
 
@@ -129,3 +129,6 @@ A small model can invent facts, so:
 - Tue, 24-Nov-2026: v0.5.2. A missing or unreadable PDF now gives a clear message instead of a Python traceback.
   Checked end to end: an invented-person PDF imported with `gemma4` (30 facts, all found, 96 s), then `check` and
   `build` passed.
+- Tue, 24-Nov-2026: v0.5.3. Found by making a repository from the template as a new user: the first run (started
+  by creating the repository) failed because Pages was not on yet. The workflow now checks first; without Pages it
+  still checks and builds the CV and ends with an "Almost there" note instead of a failure.
