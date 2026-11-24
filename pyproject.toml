@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cvkit"
-version = "0.5.1"
+version = "0.5.2"
 description = "A minimal CV site and an ATS version from one data file."
 readme = "README.md"
 requires-python = ">=3.10"

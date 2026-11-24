@@ -162,3 +162,11 @@ def test_unknown_api_and_remote_guard():
         connect("cloudthing")
     with pytest.raises(ModelError):
         connect("openai", host="https://api.example.com")
+
+
+def test_import_missing_or_broken_pdf(tmp_path, capsys):
+    assert cli.main(["import", str(tmp_path / "nope.pdf"), "--root", str(tmp_path)]) == 2
+    (tmp_path / "broken.pdf").write_text("not a pdf")
+    assert cli.main(["import", str(tmp_path / "broken.pdf"), "--root", str(tmp_path)]) == 2
+    err = capsys.readouterr().err
+    assert "nope.pdf not found" in err and "could not read broken.pdf" in err

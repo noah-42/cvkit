@@ -57,10 +57,14 @@ MONTH_WORDS = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "o
 
 
 def read_source(path: Path) -> str:
+    if not path.is_file():
+        raise FileNotFoundError(f"{path} not found")
     if path.suffix.lower() == ".pdf":
         if shutil.which("pdftotext"):
-            return subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True,
-                                  text=True, timeout=60).stdout
+            r = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, timeout=60)
+            if r.returncode != 0:
+                raise RuntimeError(f"could not read {path.name} as a PDF ({r.stderr.strip()[:120] or 'pdftotext failed'})")
+            return r.stdout
         try:
             from pypdf import PdfReader
         except ImportError:

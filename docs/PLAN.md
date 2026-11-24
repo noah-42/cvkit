@@ -1,6 +1,6 @@
 # cvkit plan
 
-Status: all five phases done, Tue, 24-Nov-2026 (v0.5.1).
+Status: all five phases done, Tue, 24-Nov-2026 (v0.5.2).
 
 ## Goal
 
@@ -126,3 +126,6 @@ A small model can invent facts, so:
   through Ollama's `/v1` 32 facts, 0 flagged, 51 s; through LM Studio (`google/gemma-4-e4b`, server started for the
   test and stopped after) 32 facts, 0 flagged, 78 s. llama.cpp uses the same protocol but was not run live (not
   installed here). Nothing open in the plan.
+- Tue, 24-Nov-2026: v0.5.2. A missing or unreadable PDF now gives a clear message instead of a Python traceback.
+  Checked end to end: an invented-person PDF imported with `gemma4` (30 facts, all found, 96 s), then `check` and
+  `build` passed.
