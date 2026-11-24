@@ -41,6 +41,11 @@ model only copies facts; cvkit then checks every fact against the old CV's text.
 left out: in a terminal you are asked about each one, otherwise they are listed in `cv.flagged.json`. If `cv.json`
 already exists, the result goes to `cv.imported.json`.
 
+Other local model servers work too: `--api lmstudio` ([LM Studio](https://lmstudio.ai), port 1234), `--api llamacpp`
+(llama.cpp's `llama-server`, port 8080) or `--api openai --host http://localhost:<port>` for any other server with an
+OpenAI-style API. Without `--model`, cvkit uses the first model the server has loaded. Set `CVKIT_API` to make one
+the default.
+
 `cvkit polish` and `cvkit interview` use the same local model. A suggestion may never contain a number or a name
 that is not in the text it came from (the old bullet, or your own answer); suggestions that break this are dropped
 and named. Nothing changes in `cv.json` until you accept, and the previous file is kept as `cv.json.bak`. Outside a

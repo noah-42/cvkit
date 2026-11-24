@@ -131,3 +131,34 @@ def test_model_retries_once_when_answer_is_not_json(monkeypatch):
     monkeypatch.setattr(m, "_post", lambda path, body: next(replies2))
     with pytest.raises(ModelError):
         m.json("sys", "user", {"type": "object"})
+
+
+def test_openai_compatible_picks_model_and_reads_answer(monkeypatch):
+    from cvkit.llm import OpenAICompatible, connect
+    m = connect("lmstudio")
+    assert isinstance(m, OpenAICompatible) and m.host == "http://localhost:1234"
+    assert connect("llamacpp").host == "http://localhost:8080"
+    sent = []
+    monkeypatch.setattr(m, "_request", lambda path, body=None: {"data": [{"id": "text-embedding-x"}, {"id": "google/gemma-4-e4b"}]})
+    monkeypatch.setattr(m, "_post", lambda path, body: sent.append((path, body)) or
+                        {"choices": [{"message": {"content": "{\"bullets\": [\"ok\"]}"}}]})
+    assert m.json("sys", "user", {"type": "object"}) == {"bullets": ["ok"]}
+    path, body = sent[0]
+    assert path == "/v1/chat/completions" and body["model"] == "google/gemma-4-e4b"
+    assert body["response_format"]["type"] == "json_schema" and body["temperature"] == 0
+
+
+def test_openai_compatible_without_models(monkeypatch):
+    from cvkit.llm import connect
+    m = connect("lmstudio")
+    monkeypatch.setattr(m, "_request", lambda path, body=None: {"data": []})
+    with pytest.raises(ModelError):
+        m.json("sys", "user", {"type": "object"})
+
+
+def test_unknown_api_and_remote_guard():
+    from cvkit.llm import connect
+    with pytest.raises(ModelError):
+        connect("cloudthing")
+    with pytest.raises(ModelError):
+        connect("openai", host="https://api.example.com")

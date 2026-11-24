@@ -1,6 +1,6 @@
 # cvkit plan
 
-Status: all five phases done, Tue, 24-Nov-2026 (v0.5.0).
+Status: all five phases done, Tue, 24-Nov-2026 (v0.5.1).
 
 ## Goal
 
@@ -121,3 +121,8 @@ A small model can invent facts, so:
   (`docs/getting-started.md`, `docs/cv-json.md`), a second theme "paper" (serif headings, light and dark, checked at
   desktop and phone width), `cvkit init --theme` and `cvkit theme`. The launch post is drafted for Noah's review and
   not published. Still open: LM Studio and llama.cpp support.
+- Tue, 24-Nov-2026: v0.5.1. OpenAI-style connection for LM Studio, llama.cpp and other local servers (`--api lmstudio |
+  llamacpp | openai`, or `CVKIT_API`), same local-only guard and JSON retry as Ollama. Live on the invented CV:
+  through Ollama's `/v1` 32 facts, 0 flagged, 51 s; through LM Studio (`google/gemma-4-e4b`, server started for the
+  test and stopped after) 32 facts, 0 flagged, 78 s. llama.cpp uses the same protocol but was not run live (not
+  installed here). Nothing open in the plan.

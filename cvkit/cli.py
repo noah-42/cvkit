@@ -114,8 +114,8 @@ def _import(a) -> int:
 
 
 def _model(a):
-    from .llm import Ollama
-    return Ollama(a.model, a.host, allow_remote=a.allow_remote)
+    from .llm import connect
+    return connect(a.api, a.model, a.host, allow_remote=a.allow_remote)
 
 
 def _polish(a) -> int:
@@ -264,8 +264,11 @@ def main(argv: list[str] | None = None) -> int:
     tl.add_argument("--publish", action="store_true", help="publish it at /cv/<slug>/ (noindex) instead of private/")
     tl.add_argument("--no-pdf", action="store_true", help="skip the PDF")
     for p in (im, pol, itv, tl):
-        p.add_argument("--model", help="Ollama model (default: $CVKIT_MODEL or gemma4)")
-        p.add_argument("--host", help="Ollama address (default: $OLLAMA_HOST or http://localhost:11434)")
+        p.add_argument("--api", choices=["ollama", "lmstudio", "llamacpp", "openai"],
+                       help="model server (default: $CVKIT_API or ollama)")
+        p.add_argument("--model", help="model name (default: $CVKIT_MODEL; gemma4 for Ollama, the first loaded "
+                                       "model for the others)")
+        p.add_argument("--host", help="server address (default: localhost with the server's usual port)")
         p.add_argument("--allow-remote", action="store_true", help="allow a model host that is not this computer")
     im.add_argument("--no-ask", action="store_true", help="leave flagged items out without asking")
 

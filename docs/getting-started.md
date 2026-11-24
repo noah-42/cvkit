@@ -44,6 +44,9 @@ Install [Ollama](https://ollama.com), then get Gemma 4 (about 10 GB; 16 GB of me
 ollama pull gemma4
 ```
 
+Prefer [LM Studio](https://lmstudio.ai)? Load a model there, start its server, and add `--api lmstudio` to the
+commands below (`--api llamacpp` for llama.cpp's `llama-server`).
+
 | Command | What it does |
 |---|---|
 | `cvkit import old_cv.pdf` | Copies the facts from an old CV into `cv.json` |
