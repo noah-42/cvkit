@@ -1,6 +1,6 @@
 # cvkit plan
 
-Status: phase 4 done, Tue, 24-Nov-2026.
+Status: all five phases done, Tue, 24-Nov-2026 (v0.5.0).
 
 ## Goal
 
@@ -117,3 +117,7 @@ A small model can invent facts, so:
   is personal; `--publish` puts them at `/cv/<slug>/` (noindex, no JSON-LD). `cvkit build` and `cvkit pdf` include
   published versions. The job-ad keyword list now prefers names and tools written with a capital, then repeated
   words. Live on the invented CV and job ad with `gemma4`: 43 s; the unrelated bullet was dropped, Airflow moved first.
+- Tue, 24-Nov-2026: v0.5.0, phase 5. MIT licence (copyright line: noah-42), package metadata, docs
+  (`docs/getting-started.md`, `docs/cv-json.md`), a second theme "paper" (serif headings, light and dark, checked at
+  desktop and phone width), `cvkit init --theme` and `cvkit theme`. The launch post is drafted for Noah's review and
+  not published. Still open: LM Studio and llama.cpp support.

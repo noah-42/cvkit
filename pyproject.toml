@@ -4,12 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cvkit"
-version = "0.4.0"
+version = "0.5.0"
 description = "A minimal CV site and an ATS version from one data file."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "noah-42" }]
+keywords = ["cv", "resume", "ats", "github-pages", "ollama", "gemma", "json-resume"]
+classifiers = ["Programming Language :: Python :: 3", "Environment :: Console", "Topic :: Text Processing :: Markup :: HTML"]
 dependencies = ["jinja2>=3.1"]
+
+[project.urls]
+Homepage = "https://github.com/noah-42/cvkit"
+Template = "https://github.com/noah-42/cvkit-template"
 
 [project.scripts]
 cvkit = "cvkit.cli:main"
@@ -18,4 +26,4 @@ cvkit = "cvkit.cli:main"
 include = ["cvkit*"]
 
 [tool.setuptools.package-data]
-cvkit = ["templates/*.j2", "scaffold/**/*", "scaffold/.github/workflows/*", "scaffold/.gitignore"]
+cvkit = ["templates/*.j2", "css_themes/*.css", "scaffold/**/*", "scaffold/.github/workflows/*", "scaffold/.gitignore"]

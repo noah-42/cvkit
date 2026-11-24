@@ -55,9 +55,15 @@ def _pdf(a) -> int:
 
 def _init(a) -> int:
     from .init import init
-    for path in init(Path(a.root)):
+    for path in init(Path(a.root), a.theme):
         print(f"wrote {path}")
     print("\nNext: edit cv.json, then run `cvkit serve` to look at it.")
+    return 0
+
+
+def _theme(a) -> int:
+    from .init import set_theme
+    print(f"wrote {set_theme(Path(a.root), a.name)} (old file kept as style.css.bak)")
     return 0
 
 
@@ -236,7 +242,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--font", choices=["mono", "sans"], help="override site.print.font")
     p.add_argument("--min-pt", type=float, help="override site.print.min_pt (smallest font size allowed)")
     p.add_argument("--max-pages", type=int, help="override site.print.max_pages")
-    cmd("init", _init, "create a new site folder from the starter files")
+    ini = cmd("init", _init, "create a new site folder from the starter files")
+    ini.add_argument("--theme", default="minimal", choices=["minimal", "paper"], help="look of the designed page")
+    th = cmd("theme", _theme, "switch the designed page to a built-in theme (minimal or paper)", root_positional=False)
+    th.add_argument("name", choices=["minimal", "paper"])
+
     s = cmd("serve", _serve, "build into a temporary folder and show it on localhost")
     s.add_argument("--port", type=int, default=8000)
     cmd("export-jsonresume", _export, "print the data as JSON Resume")

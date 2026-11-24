@@ -194,3 +194,16 @@ def test_below_recommended_min_is_reported(tmp_path, monkeypatch):
     r = pdf.make_pdf(tmp_path, tmp_path / "cv.pdf", overrides={"min_pt": 9})
     assert (r.pages, r.pt) == (2, 9.0)
     assert any("below the recommended minimum" in n for n in r.notes)
+
+
+def test_init_themes(tmp_path):
+    from cvkit.init import set_theme
+    init(tmp_path / "a", theme="paper")
+    assert "Source+Serif" in (tmp_path / "a" / "css" / "style.css").read_text()
+    init(tmp_path / "b")
+    assert "Source+Serif" not in (tmp_path / "b" / "css" / "style.css").read_text()
+    set_theme(tmp_path / "b", "paper")
+    assert "Source+Serif" in (tmp_path / "b" / "css" / "style.css").read_text()
+    assert "Source+Serif" not in (tmp_path / "b" / "css" / "style.css.bak").read_text()
+    with pytest.raises(ValueError):
+        init(tmp_path / "c", theme="neon")

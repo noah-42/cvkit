@@ -2,7 +2,9 @@
 
 One data file, `cv.json`, becomes a minimal designed CV page, a plain ATS page and a PDF, published free on GitHub
 Pages. A later phase adds a model that runs on your own computer (Gemma 4 through Ollama) to help write and tailor
-the CV. Status: phase 4 done (tailoring). See [docs/PLAN.md](docs/PLAN.md).
+the CV. Status: v0.5.0, all five phases of the [plan](docs/PLAN.md) done. MIT licence.
+
+**New here?** Read [Getting started](docs/getting-started.md). The data file is described in [cv.json](docs/cv-json.md). See [docs/PLAN.md](docs/PLAN.md).
 
 ## Start a CV site
 
@@ -19,7 +21,8 @@ uvx --from git+https://github.com/noah-42/cvkit cvkit init my-cv
 
 | Command | What it does |
 |---|---|
-| `cvkit init [dir]` | Starter files: example `cv.json`, theme CSS, `.gitignore`, the GitHub Pages workflow |
+| `cvkit init [dir] [--theme paper]` | Starter files: example `cv.json`, theme CSS, `.gitignore`, the GitHub Pages workflow |
+| `cvkit theme minimal\|paper` | Switches the designed page's theme (old CSS kept as `style.css.bak`) |
 | `cvkit check [--job ad.txt]` | Checks the data (names fields, never quotes them); with `--job`, which of the ad's keywords the CV has |
 | `cvkit build [--out dir]` | Writes `index.html` (designed, with schema.org JSON-LD) and `ats/index.html` |
 | `cvkit pdf [--private]` | Prints the ATS page (set `site.pdf: true` to link it from the ATS page) to `cv.pdf` with Chrome/Chromium; `--private` adds `private.json` lines into `private/cv.pdf` |
@@ -73,3 +76,7 @@ First user: [noah-42.github.io](https://github.com/noah-42/noah-42.github.io).
 ```bash
 uv run --no-project --with pytest --with jinja2 --with-editable . python -m pytest -q tests
 ```
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
